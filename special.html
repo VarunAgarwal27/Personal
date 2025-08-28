@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Love Letter</title>
+<style>
+    body {
+        background: linear-gradient(135deg, #f8d7da, #d2b48c);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        font-family: 'Segoe UI', sans-serif;
+    }
+    .envelope {
+        position: relative;
+        width: 300px;
+        height: 200px;
+        background: #dca762;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    .seal {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 50px;
+        cursor: pointer;
+        user-select: none;
+        color: rgb(223, 89, 112);
+        animation: pulse is infinity;
+    }
+    @keyframes pulse {
+        0% { transform: translate(-50%, -50%) scale(1); }
+        50% { transform: translate(-50%, -50%) scale(1.2); }
+        100% { transform: translate(-50%, -50%) scale(1); }
+    }
+    .letter {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        height: 300px;
+        background: #fff;
+        border-top: 2px solid #ccc;
+        padding: 20px;
+        box-sizing: border-box;
+        overflow-y: auto;
+        background-image: repeating-linear-gradient(white, white 28px, #ccc 29px);
+        transition: top 1s ease;
+    }
+    .open .letter {
+        top: 0;
+    }
+    .yess-btn {
+        display: none;
+        margin-top: 20px;
+        background: pink;
+        color: brown;
+        border: none;
+        padding: 10px 20px;
+        font-size: 18px;
+        border-radius: 8px;
+        cursor: pointer;
+        animation: glow 1.5s infinite;
+    }
+    @keyframes glow {
+        0%, 100% { box-shadow: 0 0 10px pink; }
+        50% { box-shadow: 0 0 20px hotpink; }
+    }
+    canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 9999;
+    }
+</style>
+</head>
+<body>
+<div class="envelope" id="envelope">
+    <div class="seal" id="seal">❤️</div>
+    <div class="letter" id="letter">
+        <p>Sellluu babbyyyyyy...! Will Youu be mine again and honour me to call you mine for another year...??
+          And for sure with alot of love, lust, fights and smiles.... 🩷👀 
+        </p>
+        <button class="yess-btn" id="yessBtn">Yess!</button>
+    </div>
+</div>
+<canvas id="fireworks"></canvas>
+<script>
+    const envelope = document.getElementById('envelope');
+    const seal = document.getElementById('seal');
+    const letter = document.getElementById('letter');
+    const yessBtn = document.getElementById('yessBtn');
+    let clicks = 0;
+
+    seal.addEventListener('click', () => {
+        clicks++;
+        seal.style.animation = 'pulse 0.5s';
+        setTimeout(() => seal.style.animation = 'pulse 1s infinite', 500);
+        if (clicks >= 5) {
+            envelope.classList.add('open');
+            seal.style.display = 'none';
+            yessBtn.style.display = 'block';
+        }
+    });
+
+    yessBtn.addEventListener('click', () => {
+        startFireworks();
+    });
+
+    // Fireworks effect for 90 seconds
+    function startFireworks() {
+        const duration = 90 * 1000; // 90 seconds
+        const end = Date.now() + duration;
+        const fireworks = document.getElementById('fireworks');
+        const ctx = fireworks.getContext('2d');
+        fireworks.width = window.innerWidth;
+        fireworks.height = window.innerHeight;
+
+        const particles = [];
+
+        function random(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        function createParticle(x, y) {
+            const color = `hsl(${random(0, 360)}, 100%, 50%)`;
+            return { x, y, radius: random(2, 4), color, dx: random(-4, 4), dy: random(-4, 4), alpha: 1 };
+        }
+
+        function loop() {
+            ctx.clearRect(0, 0, fireworks.width, fireworks.height);
+            if (Date.now() < end) {
+                if (Math.random() < 0.2) {
+                    const x = random(0, fireworks.width);
+                    const y = random(0, fireworks.height / 2);
+                    for (let i = 0; i < 50; i++) {
+                        particles.push(createParticle(x, y));
+                    }
+                }
+            }
+
+            particles.forEach((p, i) => {
+                p.x += p.dx;
+                p.y += p.dy;
+                p.alpha -= 0.01;
+                if (p.alpha <= 0) particles.splice(i, 1);
+                else {
+                    ctx.globalAlpha = p.alpha;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.fill();
+                }
+            });
+
+            requestAnimationFrame(loop);
+        }
+
+        loop();
+    }
+</script>
+</body>
+</html>
